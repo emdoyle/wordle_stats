@@ -1,0 +1,2 @@
+slack-bolt==1.11.1
+environs==9.4.0
