@@ -11,7 +11,7 @@ def generate_wordle_thread_message() -> str:
 
 def run() -> None:
     app.client.chat_postMessage(
-        channel=ChannelID.TESTING_MARVIN.value,
+        channel=ChannelID.WORDLE.value,
         text=generate_wordle_thread_message()
     )
 
