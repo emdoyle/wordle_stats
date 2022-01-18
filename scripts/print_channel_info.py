@@ -10,7 +10,14 @@ def display_channel(channel: Dict) -> str:
 def run() -> None:
     response = app.client.conversations_list()
     channels = response["channels"]
-    print("\n".join(map(display_channel, filter(lambda channel: channel.get("is_member", False), channels))))
+    print(
+        "\n".join(
+            map(
+                display_channel,
+                filter(lambda channel: channel.get("is_member", False), channels),
+            )
+        )
+    )
 
 
 if __name__ == "__main__":
