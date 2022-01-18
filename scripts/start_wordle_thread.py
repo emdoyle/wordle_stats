@@ -1,7 +1,7 @@
 from datetime import date
 
 from app import app
-from app.constants import ChannelID
+from app.channels import get_main_channel_id
 
 
 def generate_wordle_thread_message() -> str:
@@ -11,7 +11,7 @@ def generate_wordle_thread_message() -> str:
 
 def run() -> None:
     app.client.chat_postMessage(
-        channel=ChannelID.WORDLE.value, text=generate_wordle_thread_message()
+        channel=get_main_channel_id(), text=generate_wordle_thread_message()
     )
 
 
