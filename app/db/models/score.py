@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Date, ForeignKey, Integer, String, func
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, func
 from sqlalchemy.orm import relationship
 
 from ..base import Base
@@ -10,7 +10,7 @@ class Score(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("user.id"))
     edition = Column(Integer)
-    submitted_date = Column(Date, server_default=func.now())
+    submitted_at = Column(DateTime, server_default=func.now())
     attempts = Column(Integer)
     raw = Column(String)
 
