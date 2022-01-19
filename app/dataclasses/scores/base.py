@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from enum import IntEnum
 from typing import Dict, List, Optional, Tuple
 
-from app.constants import WORDLE_WORD_LENGTH
+from app.constants import WORDLE_MAX_ATTEMPTS, WORDLE_WORD_LENGTH
 
 
 class BlockColor(IntEnum):
@@ -20,11 +20,8 @@ BLOCK_COLOR_BY_EMOJI = {
 
 @dataclass
 class WordleLine:
-    blocks: Tuple[
-        BlockColor, BlockColor, BlockColor, BlockColor, BlockColor, BlockColor
-    ] = field(
+    blocks: Tuple[BlockColor, BlockColor, BlockColor, BlockColor, BlockColor] = field(
         default_factory=lambda: (
-            BlockColor.BLACK,
             BlockColor.BLACK,
             BlockColor.BLACK,
             BlockColor.BLACK,
@@ -47,7 +44,6 @@ class WordleLine:
             BLOCK_COLOR_BY_EMOJI[line[2]],
             BLOCK_COLOR_BY_EMOJI[line[3]],
             BLOCK_COLOR_BY_EMOJI[line[4]],
-            BLOCK_COLOR_BY_EMOJI[line[5]],
         )
         return cls(blocks=blocks)
 
@@ -93,19 +89,30 @@ class WordleScore:
         except (ValueError, IndexError):
             raise ValueError("Could not parse Wordle score. Top score line malformed.")
 
+        score_lines = wordle_score.attempts
         for line in raw_lines:
             if not line.strip():
-                # Skip any number of blank lines after top line
+                # Skip any number of blank lines
                 continue
 
-        for _, score_line in zip(range(wordle_score.attempts), raw_lines):
-            wordle_line = WordleLine.parse(score_line)
+            wordle_line = WordleLine.parse(line)
             wordle_score.lines.append(wordle_line)
+
+            score_lines -= 1
+            if not score_lines:
+                # If we have a score line for each attempt, ignore the rest
+                break
 
         return wordle_score
 
-    def validate(self) -> bool:
-        if self.attempts != len(self.lines) or self.attempts > WORDLE_WORD_LENGTH:
+    def validate(self, raise_error: bool = False) -> bool:
+        if self.attempts != len(self.lines) or self.attempts > WORDLE_MAX_ATTEMPTS:
+            if raise_error:
+                raise ValueError(
+                    f"Wordle score invalid. Number of attempts {self.attempts} does not match "
+                    f"number of lines ({len(self.lines)}) "
+                    f"or is above {WORDLE_MAX_ATTEMPTS}."
+                )
             return False
         final_attempt_index = self.attempts - 1
         return self.lines[final_attempt_index].is_winning_line

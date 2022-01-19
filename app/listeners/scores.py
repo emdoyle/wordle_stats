@@ -48,19 +48,16 @@ def handle_score_submission(client, payload):
 def handle_wordle_score(ack, action, respond, body):
     ack()
 
-    def fail():
-        respond(
-            text="Could not submit score :( Please try again later!",
-            response_type="ephemeral",
-            replace_original=True,
-        )
-
     try:
         username = body["user"]["username"]
         raw_score = action["value"]
     except KeyError:
         # TODO: logger
-        fail()
+        respond(
+            text="Could not submit score :( Please try again later!",
+            response_type="ephemeral",
+            replace_original=True,
+        )
         return
 
     with Session(engine) as session:
@@ -72,12 +69,51 @@ def handle_wordle_score(ack, action, respond, body):
             user = User(username=username)
             session.add(user)
 
-        wordle_score = WordleScore.parse(raw_score=raw_score)
-        # TODO: date could be based on the edition... or could just store the edition instead of date
+        try:
+            wordle_score = WordleScore.parse(raw_score=raw_score)
+            wordle_score.validate(raise_error=True)
+        except ValueError as e:
+            respond(
+                blocks=[
+                    asdict(
+                        PlainTextSection(
+                            text=PlainTextBlock(
+                                text=(
+                                    "Click the 'Share' button on your Wordle screen "
+                                    "and paste from your clipboard below!"
+                                ),
+                                emoji=True,
+                            )
+                        )
+                    ),
+                    asdict(
+                        MultiLineTextInputBlock(
+                            label=PlainTextLabel(
+                                text=":clipboard: Paste your score here:", emoji=True
+                            ),
+                            element=PlainTextInput(
+                                multiline=True, action_id="submit_score"
+                            ),
+                        )
+                    ),
+                    asdict(
+                        PlainTextSection(
+                            text=PlainTextBlock(
+                                text=f"Error: {e}",
+                                emoji=True,
+                            )
+                        )
+                    ),
+                ],
+                response_type="ephemeral",
+                replace_original=True,
+            )
+            return
+
         session.add(
             Score(
                 user=user,
-                date=date.today(),
+                edition=wordle_score.edition,
                 attempts=wordle_score.attempts,
                 raw=raw_score,
             )
@@ -89,8 +125,3 @@ def handle_wordle_score(ack, action, respond, body):
         response_type="ephemeral",
         replace_original=True,
     )
-
-
-@app.message("hello")
-def weird(say):
-    say("weird...")
