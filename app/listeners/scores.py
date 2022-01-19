@@ -1,19 +1,11 @@
 import re
-from dataclasses import asdict
-from datetime import date
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..apps import app
-from ..dataclasses import (
-    MultiLineTextInputBlock,
-    PlainTextBlock,
-    PlainTextInput,
-    PlainTextLabel,
-    PlainTextSection,
-)
-from ..dataclasses.scores.base import WordleScore
+from ..blocks import get_error_block, get_submit_score_blocks
+from ..dataclasses import WordleScore
 from ..db import Score, User, engine
 
 
@@ -23,24 +15,7 @@ def handle_score_submission(client, payload):
         channel=payload["channel"],
         user=payload["user"],
         text="Share your Wordle score",
-        blocks=[
-            asdict(
-                PlainTextSection(
-                    text=PlainTextBlock(
-                        text="Click the 'Share' button on your Wordle screen and paste from your clipboard below!",
-                        emoji=True,
-                    )
-                )
-            ),
-            asdict(
-                MultiLineTextInputBlock(
-                    label=PlainTextLabel(
-                        text=":clipboard: Paste your score here:", emoji=True
-                    ),
-                    element=PlainTextInput(multiline=True, action_id="submit_score"),
-                )
-            ),
-        ],
+        blocks=get_submit_score_blocks(),
     )
 
 
@@ -75,35 +50,8 @@ def handle_wordle_score(ack, action, respond, body):
         except ValueError as e:
             respond(
                 blocks=[
-                    asdict(
-                        PlainTextSection(
-                            text=PlainTextBlock(
-                                text=(
-                                    "Click the 'Share' button on your Wordle screen "
-                                    "and paste from your clipboard below!"
-                                ),
-                                emoji=True,
-                            )
-                        )
-                    ),
-                    asdict(
-                        MultiLineTextInputBlock(
-                            label=PlainTextLabel(
-                                text=":clipboard: Paste your score here:", emoji=True
-                            ),
-                            element=PlainTextInput(
-                                multiline=True, action_id="submit_score"
-                            ),
-                        )
-                    ),
-                    asdict(
-                        PlainTextSection(
-                            text=PlainTextBlock(
-                                text=f"Error: {e}",
-                                emoji=True,
-                            )
-                        )
-                    ),
+                    *get_submit_score_blocks(),
+                    get_error_block(error=e),
                 ],
                 response_type="ephemeral",
                 replace_original=True,
