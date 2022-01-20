@@ -36,16 +36,21 @@ class WordleLine:
         line = raw_line.strip()
         if len(line) != WORDLE_WORD_LENGTH:
             raise ValueError(
-                f"Could not parse Wordle score. Malformed line received: {raw_line}"
+                f"Could not parse Wordle score. Malformed line received: {line}"
             )
 
-        blocks = (
-            BLOCK_COLOR_BY_EMOJI[line[0]],
-            BLOCK_COLOR_BY_EMOJI[line[1]],
-            BLOCK_COLOR_BY_EMOJI[line[2]],
-            BLOCK_COLOR_BY_EMOJI[line[3]],
-            BLOCK_COLOR_BY_EMOJI[line[4]],
-        )
+        try:
+            blocks = (
+                BLOCK_COLOR_BY_EMOJI[line[0]],
+                BLOCK_COLOR_BY_EMOJI[line[1]],
+                BLOCK_COLOR_BY_EMOJI[line[2]],
+                BLOCK_COLOR_BY_EMOJI[line[3]],
+                BLOCK_COLOR_BY_EMOJI[line[4]],
+            )
+        except KeyError:
+            raise ValueError(
+                f"Could not parse Wordle score. Unknown block character received in line: {line}"
+            )
         return cls(blocks=blocks)
 
     @property
