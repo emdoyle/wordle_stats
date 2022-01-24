@@ -115,7 +115,13 @@ class WordleScore:
 
     def validate(self, raise_error: bool = False) -> bool:
         if self.attempts is None:
-            return not self.lines[WORDLE_MAX_ATTEMPTS - 1].is_winning_line
+            valid = not self.lines[WORDLE_MAX_ATTEMPTS - 1].is_winning_line
+            if not valid and raise_error:
+                raise ValueError(
+                    f"Wordle score invalid. Number of attempts indicates failure "
+                    f"but final line indicates success."
+                )
+            return valid
         if self.attempts != len(self.lines) or self.attempts > WORDLE_MAX_ATTEMPTS:
             if raise_error:
                 raise ValueError(
