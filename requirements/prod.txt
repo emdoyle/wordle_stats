@@ -1,3 +1,4 @@
 slack-bolt==1.11.1
 environs==9.4.0
 SQLAlchemy==1.4.29
+alembic==1.7.5

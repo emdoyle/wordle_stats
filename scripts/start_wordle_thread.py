@@ -1,6 +1,6 @@
 from datetime import date
 
-from app import app
+from app.apps import app
 from app.channels import get_main_channel_id
 
 

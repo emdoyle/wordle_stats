@@ -1,6 +1,6 @@
 from typing import Dict
 
-from app import app
+from app.apps import app
 
 
 def display_channel(channel: Dict) -> str:
