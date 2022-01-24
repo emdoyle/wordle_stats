@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from enum import IntEnum
 from typing import Dict, List, Optional, Tuple
 
-from app.constants import WORDLE_MAX_ATTEMPTS, WORDLE_WORD_LENGTH
+from app.constants import WORDLE_FAIL_INDICATOR, WORDLE_MAX_ATTEMPTS, WORDLE_WORD_LENGTH
 
 
 class BlockColor(IntEnum):
@@ -91,11 +91,13 @@ class WordleScore:
         try:
             _, edition, attempts = top_line.split(" ")
             wordle_score.edition = int(edition)
-            wordle_score.attempts = int(attempts[0])
+            raw_attempts = attempts[0]
+            if raw_attempts != WORDLE_FAIL_INDICATOR:
+                wordle_score.attempts = int(attempts[0])
         except (ValueError, IndexError):
             raise ValueError("Could not parse Wordle score. Top score line malformed.")
 
-        score_lines = wordle_score.attempts
+        score_lines = wordle_score.attempts or WORDLE_MAX_ATTEMPTS
         for line in raw_lines:
             if not line.strip():
                 # Skip any number of blank lines
@@ -112,6 +114,8 @@ class WordleScore:
         return wordle_score
 
     def validate(self, raise_error: bool = False) -> bool:
+        if self.attempts is None:
+            return not self.lines[WORDLE_MAX_ATTEMPTS - 1].is_winning_line
         if self.attempts != len(self.lines) or self.attempts > WORDLE_MAX_ATTEMPTS:
             if raise_error:
                 raise ValueError(
