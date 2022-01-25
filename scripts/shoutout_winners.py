@@ -1,0 +1,87 @@
+from datetime import datetime, timedelta, timezone
+
+from sqlalchemy import desc, select
+from sqlalchemy.orm import Session
+
+from app.apps import app
+from app.channels import get_main_channel_id
+from app.dataclasses.users import UserMention
+from app.db import Score, User, engine
+
+EMOJI_PLACEMENTS = [
+    ":first_place_medal:",
+    ":second_place_medal:",
+    ":third_place_medal:",
+]
+
+
+def generate_winners_message() -> str:
+    # - TODO: unique constraint for (user_id, edition) on Score, handle this in submission
+    # Wordle [edition] has concluded! Congratulations to podium finishers :tada:
+    #
+    # :first_place_medal: (user_mentions)
+    # :second_place_medal: (user_mentions)
+    # :third_place_medal: (user_mentions)
+    today = datetime.now()  # in PST
+    midnight = today.replace(hour=0, minute=0, second=0, microsecond=0)
+    yesterday_midnight = midnight - timedelta(days=1)
+    midnight_utc = midnight.astimezone(timezone.utc)
+    yesterday_midnight_utc = yesterday_midnight.astimezone(timezone.utc)
+    with Session(engine) as session:
+        latest_edition = session.execute(
+            select(Score.edition)
+            .where(
+                Score.submitted_at >= yesterday_midnight_utc,
+                Score.submitted_at < midnight_utc,
+            )
+            .order_by(desc(Score.edition))
+            .limit(1)
+        ).first()
+        if latest_edition is None:
+            return "No scores found for yesterday's Wordle! :disappointed:"
+        latest_edition = latest_edition[0]
+        scores = session.execute(
+            select(User.slack_id, User.username, Score.edition, Score.attempts)
+            .join(User.scores)
+            .where(
+                Score.submitted_at >= yesterday_midnight_utc,
+                Score.submitted_at < midnight_utc,
+                Score.edition == latest_edition,
+                Score.attempts != None,
+            )
+            .order_by(Score.attempts)
+        ).all()
+    if not scores:
+        return "No wins found for yesterday's Wordle! :grimacing: Hard one?"
+
+    score_iter = iter(scores)
+    current_score = next(score_iter)
+    best_attempts = current_score[3]
+    header = f"Wordle {latest_edition} has concluded! Congratulations to podium finishers :tada:"
+    result_rows = []
+    for placement in EMOJI_PLACEMENTS:
+        recipients = []
+        while current_score is not None:
+            if current_score[3] > best_attempts:
+                best_attempts = current_score[3]
+                break
+            recipients.append(
+                UserMention(slack_id=current_score[0], username=current_score[1])
+            )
+            current_score = next(score_iter, None)
+        result_rows.append(
+            f"{placement} {' '.join(map(lambda recipient: recipient.encoded, recipients)) or 'None'}"
+        )
+
+    results = "\n".join(result_rows)
+    return f"{header}\n\n{results}"
+
+
+def run() -> None:
+    app.client.chat_postMessage(
+        channel=get_main_channel_id(), text=generate_winners_message()
+    )
+
+
+if __name__ == "__main__":
+    run()
