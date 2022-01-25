@@ -8,6 +8,7 @@ class User(Base):
     __tablename__ = "user"
 
     id = Column(Integer, primary_key=True)
+    slack_id = Column(String, unique=True)
     username = Column(String, unique=True)
     display_name = Column(String, server_default="", nullable=False)
     real_name = Column(String, server_default="", nullable=False)

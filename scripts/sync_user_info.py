@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+from typing import Dict
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -5,14 +8,26 @@ from app.apps import app
 from app.db import User, engine
 
 
+@dataclass
+class UserInfo:
+    display_name: str = ""
+    real_name: str = ""
+    slack_id: str = ""
+
+    @classmethod
+    def from_user_data(cls, user_data: Dict) -> "UserInfo":
+        return cls(
+            display_name=user_data["profile"]["display_name"],
+            real_name=user_data["profile"]["real_name"],
+            slack_id=user_data["id"],
+        )
+
+
 def run() -> None:
     response = app.client.users_list()
     latest_user_data = response["members"]
     latest_user_data_by_username = {
-        user_data["name"]: (
-            user_data["profile"]["display_name"],
-            user_data["profile"]["real_name"],
-        )
+        user_data["name"]: UserInfo.from_user_data(user_data)
         for user_data in latest_user_data
     }
     with Session(engine) as session:
@@ -24,8 +39,9 @@ def run() -> None:
             if latest_data_for_user is not None:
                 print(f"Updating user: {current_user}")
                 print(f"\twith data: {latest_data_for_user}")
-                current_user.display_name = latest_data_for_user[0]
-                current_user.real_name = latest_data_for_user[1]
+                current_user.display_name = latest_data_for_user.display_name
+                current_user.real_name = latest_data_for_user.real_name
+                current_user.slack_id = latest_data_for_user.slack_id
                 session.add(current_user)
         session.commit()
 
