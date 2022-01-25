@@ -60,5 +60,7 @@ def handle_scores_command(ack, respond, command):
     except ValueError as e:
         respond(blocks=get_error_block(error=e))
         return
+    if not user_mentions:
+        respond(text="Usage: /scores @user1 [@user2 ...]")
     response_text = "\n\n".join(map(display_user_scores, user_mentions))
     respond(text=response_text)
