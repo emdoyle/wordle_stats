@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.apps import app
 from app.channels import get_main_channel_id
+from app.constants import WORDLE_MAX_ATTEMPTS
 from app.dataclasses.users import UserMention
 from app.db import Score, User, engine
 
@@ -61,6 +62,7 @@ def generate_winners_message() -> str:
     result_rows = []
     for placement in EMOJI_PLACEMENTS:
         recipients = []
+        attempts = best_attempts
         while current_score is not None:
             if current_score[3] > best_attempts:
                 best_attempts = current_score[3]
@@ -69,9 +71,9 @@ def generate_winners_message() -> str:
                 UserMention(slack_id=current_score[0], username=current_score[1])
             )
             current_score = next(score_iter, None)
-        result_rows.append(
-            f"{placement} {' '.join(map(lambda recipient: recipient.encoded, recipients)) or 'None'}"
-        )
+        winners = " ".join(map(lambda recipient: recipient.encoded, recipients))
+        attempts_display = f"{attempts}/{WORDLE_MAX_ATTEMPTS}" if winners else ""
+        result_rows.append(f"{placement} {winners or 'None'} {attempts_display}")
 
     results = "\n".join(result_rows)
     return f"{header}\n\n{results}"
