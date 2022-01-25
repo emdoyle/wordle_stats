@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.apps import app
 from app.blocks import get_error_block
-from app.constants import WORDLE_MAX_ATTEMPTS
+from app.constants import WORDLE_FAIL_INDICATOR, WORDLE_MAX_ATTEMPTS
 from app.dataclasses.users import UserMention
 from app.db import Score, User, engine
 
@@ -44,7 +44,7 @@ def display_user_scores(user_mention: "UserMention") -> str:
     header = f"{user_mention.encoded} (Avg: {user_scores.get('average_attempts')})"
     recent_rows = "\n".join(
         (
-            f"Wordle {score[0]}: {score[1]}/{WORDLE_MAX_ATTEMPTS}"
+            f"Wordle {score[0]}: {score[1] or WORDLE_FAIL_INDICATOR}/{WORDLE_MAX_ATTEMPTS}"
             for score in user_scores.get("recent_attempts", [])
         )
     )
