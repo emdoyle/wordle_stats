@@ -1,1 +1,2 @@
-from .scores import handle_score_submission
+from .display_scores import handle_scores_command
+from .submit_score import handle_score_submission
