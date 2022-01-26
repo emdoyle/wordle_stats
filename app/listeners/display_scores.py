@@ -57,10 +57,10 @@ def handle_scores_command(ack, respond, command):
     items = command["text"].strip().split()
     try:
         user_mentions = map(UserMention.parse, items)
+        response_text = "\n\n".join(map(display_user_scores, user_mentions))
     except ValueError as e:
-        respond(blocks=get_error_block(error=e))
+        respond(blocks=[get_error_block(error=e)])
         return
-    if not user_mentions:
+    if not response_text:
         respond(text="Usage: /scores @user1 [@user2 ...]")
-    response_text = "\n\n".join(map(display_user_scores, user_mentions))
     respond(text=response_text)
