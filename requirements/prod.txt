@@ -2,3 +2,7 @@ slack-bolt==1.11.1
 environs==9.4.0
 SQLAlchemy==1.4.29
 alembic==1.7.5
+fastapi==0.73.0
+uvicorn==0.17.0.post1
+aiohttp==3.8.1
+aiodns==3.0.0
