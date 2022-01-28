@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from ..apps import app
 from ..blocks import get_error_block, get_submit_score_blocks
 from ..dataclasses import WordleScore
-from ..db import Score, User, engine
+from ..db import Score, User, get_engine
 
 
 @app.message(re.compile(r"\bsubmit score\b", re.IGNORECASE))
@@ -24,6 +24,7 @@ def handle_wordle_score(ack, action, respond, body):
     ack()
 
     try:
+        team_id = body["team"]["id"]
         username = body["user"]["username"]
         raw_score = action["value"]
     except KeyError:
@@ -35,7 +36,7 @@ def handle_wordle_score(ack, action, respond, body):
         )
         return
 
-    with Session(engine) as session:
+    with Session(get_engine(team_id=team_id)) as session:
         try:
             user = session.execute(
                 select(User).where(User.username == username)

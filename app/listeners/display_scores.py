@@ -7,11 +7,11 @@ from app.apps import app
 from app.blocks import get_error_block
 from app.constants import WORDLE_FAIL_INDICATOR, WORDLE_MAX_ATTEMPTS
 from app.dataclasses.users import UserMention
-from app.db import Score, User, engine
+from app.db import Score, User, get_engine
 
 
-def get_individual_scores(user_mention: "UserMention") -> Dict:
-    with Session(engine) as session:
+def get_individual_scores(team_id: str, user_mention: "UserMention") -> Dict:
+    with Session(get_engine(team_id=team_id)) as session:
         try:
             average_attempts = session.execute(
                 select(
@@ -39,8 +39,8 @@ def get_individual_scores(user_mention: "UserMention") -> Dict:
             return {}
 
 
-def display_user_scores(user_mention: "UserMention") -> str:
-    user_scores = get_individual_scores(user_mention=user_mention)
+def display_user_scores(team_id: str, user_mention: "UserMention") -> str:
+    user_scores = get_individual_scores(team_id=team_id, user_mention=user_mention)
     header = f"{user_mention.encoded} (Avg: {user_scores.get('average_attempts')})"
     recent_rows = "\n".join(
         (
@@ -54,10 +54,16 @@ def display_user_scores(user_mention: "UserMention") -> str:
 @app.command("/scores")
 def handle_scores_command(ack, respond, command):
     ack()
+    team_id = command["team_id"]
     items = command["text"].strip().split()
     try:
         user_mentions = map(UserMention.parse, items)
-        response_text = "\n\n".join(map(display_user_scores, user_mentions))
+        response_text = "\n\n".join(
+            (
+                display_user_scores(team_id, user_mention)
+                for user_mention in user_mentions
+            )
+        )
     except ValueError as e:
         respond(blocks=[get_error_block(error=e)])
         return
