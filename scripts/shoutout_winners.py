@@ -4,10 +4,12 @@ from sqlalchemy import desc, select
 from sqlalchemy.orm import Session
 
 from app.apps import app
-from app.channels import get_main_channel_id
 from app.constants import WORDLE_MAX_ATTEMPTS
 from app.dataclasses.users import UserMention
-from app.db import Score, User, engine
+from app.db import Score, User, get_engine
+from util.channels import get_member_channel_ids
+from util.teams import installed_team_ids
+from util.timezone import PACIFIC_TIME
 
 EMOJI_PLACEMENTS = [
     ":first_place_medal:",
@@ -16,19 +18,19 @@ EMOJI_PLACEMENTS = [
 ]
 
 
-def generate_winners_message() -> str:
+def generate_winners_message(team_id: str) -> str:
     # - TODO: unique constraint for (user_id, edition) on Score, handle this in submission
     # Wordle [edition] has concluded! Congratulations to podium finishers :tada:
     #
     # :first_place_medal: (user_mentions)
     # :second_place_medal: (user_mentions)
     # :third_place_medal: (user_mentions)
-    today = datetime.now()  # in PST
+    today = datetime.now(PACIFIC_TIME)
     midnight = today.replace(hour=0, minute=0, second=0, microsecond=0)
     yesterday_midnight = midnight - timedelta(days=1)
     midnight_utc = midnight.astimezone(timezone.utc)
     yesterday_midnight_utc = yesterday_midnight.astimezone(timezone.utc)
-    with Session(engine) as session:
+    with Session(get_engine(team_id=team_id)) as session:
         latest_edition = session.execute(
             select(Score.edition)
             .where(
@@ -80,9 +82,10 @@ def generate_winners_message() -> str:
 
 
 def run() -> None:
-    app.client.chat_postMessage(
-        channel=get_main_channel_id(), text=generate_winners_message()
-    )
+    for team_id in installed_team_ids():
+        message = generate_winners_message(team_id=team_id)
+        for channel_id in get_member_channel_ids(team_id=team_id):
+            app.client.chat_postMessage(channel=channel_id, text=message)
 
 
 if __name__ == "__main__":

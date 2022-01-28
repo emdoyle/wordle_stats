@@ -7,6 +7,7 @@ env.read_env()
 DEBUG = env.bool("DEBUG", False)
 
 DEV_SERVER_PORT = env.int("DEV_SERVER_PORT", 8000)
+TESTING_CHANNEL_ID = env.str("TESTING_CHANNEL_ID", "")
 
 SLACK_SIGNING_SECRET = env.str("SLACK_SIGNING_SECRET", "")
 SLACK_APP_TOKEN = env.str("SLACK_APP_TOKEN")
@@ -20,4 +21,5 @@ SLACK_OAUTH_REDIRECT_PATH = env.str(
     "SLACK_OAUTH_REDIRECT_PATH", "/slack/oauth_redirect"
 )
 
-DB_PATH = env.str("DB_PATH", "wordle.db")
+DB_FOLDER = env.str("DB_FOLDER", "databases/")
+DB_FILE_EXTENSION = env.str("DB_FILE_EXTENSION", ".db")
