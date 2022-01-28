@@ -17,7 +17,7 @@ SLACK_OAUTH_STATE_DIR = env.str("SLACK_OAUTH_STATE_DIR", "./data/states")
 SLACK_OAUTH_STATE_EXPIRATION = env.int("SLACK_OAUTH_STATE_EXPIRATION", 600)
 SLACK_INSTALL_PATH = env.str("SLACK_INSTALL_PATH", "/slack/install")
 SLACK_OAUTH_REDIRECT_PATH = env.str(
-    "SLACK_OAUTH_REDIRECT_PATH", "/slack/oauth-redirect"
+    "SLACK_OAUTH_REDIRECT_PATH", "/slack/oauth_redirect"
 )
 
 DB_PATH = env.str("DB_PATH", "wordle.db")
