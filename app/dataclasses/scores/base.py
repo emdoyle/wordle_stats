@@ -13,9 +13,11 @@ class BlockColor(IntEnum):
 
 BLOCK_COLOR_BY_EMOJI = {
     "⬛": BlockColor.BLACK,
-    "⬜": BlockColor.BLACK,  # workaround for non-dark mode?
+    "⬜": BlockColor.BLACK,  # workaround for non-dark mode
     "🟨": BlockColor.YELLOW,
     "🟩": BlockColor.GREEN,
+    "🟧": BlockColor.GREEN,  # workaround for colorblind mode TODO: enforce more strictly
+    "🟦": BlockColor.YELLOW,  # workaround for colorblind mode TODO: enforce more strictly
 }  # type: Dict[str, "BlockColor"]
 
 
