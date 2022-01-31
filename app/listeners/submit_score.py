@@ -25,6 +25,7 @@ def handle_wordle_score(ack, action, respond, body):
 
     try:
         team_id = body["team"]["id"]
+        user_id = body["user"]["id"]
         username = body["user"]["username"]
         raw_score = action["value"]
     except KeyError:
@@ -39,10 +40,10 @@ def handle_wordle_score(ack, action, respond, body):
     with Session(get_engine(team_id=team_id)) as session:
         try:
             user = session.execute(
-                select(User).where(User.username == username)
+                select(User).where(User.slack_id == user_id)
             ).first()[0]
         except (TypeError, IndexError):
-            user = User(username=username)
+            user = User(slack_id=user_id, username=username)
             session.add(user)
 
         try:
