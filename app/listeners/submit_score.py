@@ -9,11 +9,10 @@ from ..dataclasses import WordleScore
 from ..db import Score, User, get_engine
 
 
-@app.message(re.compile(r"\bsubmit score\b", re.IGNORECASE))
-def handle_score_submission(client, payload):
-    client.chat_postEphemeral(
-        channel=payload["channel"],
-        user=payload["user"],
+@app.command("/submit")
+def handle_score_submission(ack, respond):
+    ack()
+    respond(
         text="Share your Wordle score",
         blocks=get_submit_score_blocks(),
     )
