@@ -41,6 +41,7 @@ oauth_settings = OAuthSettings(
     client_secret=settings.SLACK_CLIENT_SECRET,
     scopes=SCOPES,
     installation_store=FileInstallationStore(base_dir=settings.SLACK_INSTALLATIONS_DIR),
+    install_page_rendering_enabled=False,
     state_store=FileOAuthStateStore(
         expiration_seconds=settings.SLACK_OAUTH_STATE_EXPIRATION,
         base_dir=settings.SLACK_OAUTH_STATE_DIR,
