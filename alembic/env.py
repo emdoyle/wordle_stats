@@ -1,3 +1,4 @@
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config, pool
@@ -6,7 +7,6 @@ from alembic import context
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
-from app import settings
 from app.db import Base
 
 config = context.config
@@ -27,7 +27,9 @@ target_metadata = Base.metadata
 # ... etc.
 
 
-config.set_main_option("sqlalchemy.url", f"sqlite+pysqlite:///{settings.DB_PATH}")
+config.set_main_option(
+    "sqlalchemy.url", f"sqlite+pysqlite:///{os.environ['ALEMBIC_DB_PATH']}"
+)
 
 
 def run_migrations_offline():

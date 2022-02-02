@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import expression
 
 from ..base import Base
 
@@ -12,6 +13,7 @@ class User(Base):
     username = Column(String, unique=True)
     display_name = Column(String, server_default="", nullable=False)
     real_name = Column(String, server_default="", nullable=False)
+    onboarded = Column(Boolean, server_default=expression.false(), nullable=False)
 
     scores = relationship("Score", back_populates="user")
 
