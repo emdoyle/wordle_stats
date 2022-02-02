@@ -12,14 +12,11 @@ def handle_app_home_opened(client, body):
     user_id = event["user"]
     channel_id = event["channel"]
 
-    client.views_publish(
+    response = client.views_publish(
         user_id=user_id, view={"type": "home", "blocks": get_home_tab_blocks()}
     )
 
-    view = event.get("view")
-    if view is None:
-        return
-
+    view = response.data["view"]
     team_id = view["team_id"]
     with Session(get_engine(team_id=team_id)) as session:
         user = (
