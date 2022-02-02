@@ -44,3 +44,15 @@ def get_help_blocks():
             )
         ),
     ]
+
+
+@functools.lru_cache()
+def get_onboarding_blocks():
+    return [
+        asdict(
+            PlainTextSection(
+                text=PlainTextBlock(text=":wave: Welcome to Wordle Stats!")
+            )
+        ),
+        *get_help_blocks(),
+    ]
