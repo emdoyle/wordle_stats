@@ -51,7 +51,7 @@ def get_onboarding_blocks():
     return [
         asdict(
             PlainTextSection(
-                text=PlainTextBlock(text=":wave: Welcome to Wordle Stats!")
+                text=PlainTextBlock(text=":wave: Welcome to Wordle Stats!", emoji=True)
             )
         ),
         *get_help_blocks(),
