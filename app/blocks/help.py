@@ -18,7 +18,8 @@ def get_help_blocks():
             PlainTextSection(
                 text=PlainTextBlock(
                     text=(
-                        "Wordle stats helps you track your Wordle scores and compete with your friends and co-workers!"
+                        "Wordle Stats helps you track your Wordle scores "
+                        "and compete with your friends and co-workers!\n"
                     ),
                     emoji=True,
                 )
@@ -27,7 +28,7 @@ def get_help_blocks():
         divider,
         asdict(
             MrkdwnSection(
-                text=MrkdwnBlock(text="Want to submit a score?\n\n\tType `/submit`")
+                text=MrkdwnBlock(text="Want to submit a score?\n\n\tType `/submit`\n")
             )
         ),
         divider,
