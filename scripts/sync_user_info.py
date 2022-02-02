@@ -34,12 +34,16 @@ def run() -> None:
             user_data["name"]: UserInfo.from_user_data(user_data)
             for user_data in latest_user_data
         }
+        latest_user_data_by_slack_id = {
+            user_data["id"]: UserInfo.from_user_data(user_data)
+            for user_data in latest_user_data
+        }
         with Session(get_engine(team_id=team_id)) as session:
             current_user_data = session.execute(select(User)).scalars().all()
             for current_user in current_user_data:
                 latest_data_for_user = latest_user_data_by_username.get(
                     current_user.username
-                )
+                ) or latest_user_data_by_slack_id.get(current_user.slack_id)
                 if latest_data_for_user is not None:
                     print(f"Updating user: {current_user}")
                     print(f"\twith data: {latest_data_for_user}")
