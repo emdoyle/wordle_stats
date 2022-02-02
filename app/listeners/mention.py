@@ -4,8 +4,10 @@ from app.regex import HELP_REGEX
 
 
 @app.event("app_mention")
-def handle_mention(body, say):
+def handle_mention(client, body):
     event = body["event"]
     if HELP_REGEX.match(event["text"]):
-        say(blocks=get_help_blocks())
+        client.chat_postEphemeral(
+            channel=event["channel"], user=event["user"], blocks=get_help_blocks()
+        )
         return

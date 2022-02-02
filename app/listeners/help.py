@@ -4,5 +4,7 @@ from app.regex import HELP_REGEX
 
 
 @app.message(HELP_REGEX)
-def handle_help(say):
-    say(blocks=get_help_blocks())
+def handle_help(client, message):
+    client.chat_postEphemeral(
+        channel=message["channel"], user=message["user"], blocks=get_help_blocks()
+    )
