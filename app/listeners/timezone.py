@@ -11,7 +11,8 @@ from app.db import User, get_engine
 @app.action(SELECT_TIMEZONE_ACTION_ID)
 def handle_select_timezone(ack, client, body, action):
     ack()
-
+    print(body)
+    print(action)
     team_id = body["team"]["id"]
     user_id = body["user"]["id"]
     username = body["user"]["username"]
@@ -41,5 +42,4 @@ def handle_select_timezone(ack, client, body, action):
 @app.options(SELECT_TIMEZONE_ACTION_ID)
 def search_timezone_options(ack, options):
     tz_options = get_timezone_options(query=options.get("value"))
-    print(tz_options)
     ack(options=tz_options)
