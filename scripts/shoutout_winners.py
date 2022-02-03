@@ -8,6 +8,7 @@ from app.constants import WORDLE_MAX_ATTEMPTS
 from app.dataclasses.users import UserMention
 from app.db import Score, User, get_engine
 from util.channels import get_member_channel_ids
+from util.tasks import daily_task
 from util.teams import installed_team_ids
 from util.timezone import PACIFIC_TIME
 
@@ -81,11 +82,16 @@ def generate_winners_message(team_id: str) -> str:
     return f"{header}\n\n{results}"
 
 
+@daily_task(app, "shoutout_winners_posted")
+def shoutout_winners(team_id: str):
+    message = generate_winners_message(team_id=team_id)
+    for channel_id in get_member_channel_ids(team_id=team_id):
+        app.client.chat_postMessage(channel=channel_id, text=message)
+
+
 def run() -> None:
     for team_id in installed_team_ids():
-        message = generate_winners_message(team_id=team_id)
-        for channel_id in get_member_channel_ids(team_id=team_id):
-            app.client.chat_postMessage(channel=channel_id, text=message)
+        shoutout_winners(team_id=team_id)
 
 
 if __name__ == "__main__":

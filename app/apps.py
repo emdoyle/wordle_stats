@@ -7,6 +7,7 @@ from slack_sdk.oauth.state_store import FileOAuthStateStore
 from util.timezone import PACIFIC_TIMEZONE_NAME
 
 from . import settings
+from .constants import TIMEZONE_CUSTOM_KEY
 from .db import Base, get_engine
 
 SCOPES = [
@@ -27,7 +28,7 @@ SCOPES = [
 
 def oauth_success(args: SuccessArgs) -> BoltResponse:
     installation = args.installation
-    installation.set_custom_value(name="timezone", value=PACIFIC_TIMEZONE_NAME)
+    installation.set_custom_value(name=TIMEZONE_CUSTOM_KEY, value=PACIFIC_TIMEZONE_NAME)
     args.settings.installation_store.save(installation)
     # TODO: async
     Base.metadata.create_all(get_engine(team_id=installation.team_id))

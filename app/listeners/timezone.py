@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.apps import app
 from app.blocks import get_home_tab_blocks
 from app.blocks.timezone import get_timezone_options
-from app.constants import SELECT_TIMEZONE_ACTION_ID
+from app.constants import SELECT_TIMEZONE_ACTION_ID, TIMEZONE_CUSTOM_KEY
 from app.db import User, get_engine
 
 
@@ -31,7 +31,7 @@ def handle_select_timezone(ack, client, body, action):
     installation = app.installation_store.find_installation(
         enterprise_id=None, team_id=team_id
     )
-    installation.set_custom_value(name="timezone", value=timezone)
+    installation.set_custom_value(name=TIMEZONE_CUSTOM_KEY, value=timezone)
     app.installation_store.save(installation)
     client.views_publish(
         user_id=user_id,
