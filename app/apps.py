@@ -26,11 +26,11 @@ SCOPES = [
 ]
 
 
+# TODO: do all this asynchronously
 def oauth_success(args: SuccessArgs) -> BoltResponse:
     installation = args.installation
     installation.set_custom_value(name=TIMEZONE_CUSTOM_KEY, value=PACIFIC_TIMEZONE_NAME)
     args.settings.installation_store.save(installation)
-    # TODO: async
     Base.metadata.create_all(get_engine(team_id=installation.team_id))
     return BoltResponse(status=200, body="Wordle has been installed successfully!")
 

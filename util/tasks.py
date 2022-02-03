@@ -23,7 +23,13 @@ def daily_task(app: "App", attribute_name: str):
             timezone = (
                 ZoneInfo(raw_timezone) if raw_timezone is not None else PACIFIC_TIME
             )
+            installed_date = datetime.fromtimestamp(
+                installation.installed_at, timezone
+            ).date()
             today = datetime.now(timezone).date()
+            if installed_date == today:
+                # Do not post on the same day the app was installed
+                return
             raw_daily_tasks = installation.get_custom_value(name=DAILY_TASKS_CUSTOM_KEY)
             daily_tasks = (
                 DailyTasks.deserialize(data=raw_daily_tasks)
