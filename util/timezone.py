@@ -3,7 +3,8 @@ from itertools import islice
 from typing import List, Optional, Tuple
 from zoneinfo import ZoneInfo
 
-from app.apps import app
+from slack_bolt import App
+
 from app.constants import TIMEZONE_CUSTOM_KEY
 
 PACIFIC_TIMEZONE_NAME = "America/Los_Angeles"
@@ -519,7 +520,7 @@ def search_timezones(query: str = "", max_results: int = 8) -> List[Tuple[str, s
     return results
 
 
-def get_timezone_for_team(team_id: str) -> Optional["ZoneInfo"]:
+def get_timezone_for_team(app: "App", team_id: str) -> Optional["ZoneInfo"]:
     installation = app.installation_store.find_installation(
         enterprise_id=None, team_id=team_id
     )

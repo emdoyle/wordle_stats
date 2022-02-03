@@ -3,7 +3,6 @@ from typing import Optional
 from zoneinfo import ZoneInfo
 
 from app.apps import app
-from app.constants import TIMEZONE_CUSTOM_KEY
 from util.auth import force_client_auth
 from util.channels import get_member_channel_ids
 from util.tasks import daily_task
@@ -20,7 +19,7 @@ def generate_wordle_thread_message(timezone: Optional["ZoneInfo"] = None) -> str
 
 @daily_task(app, "solution_thread_posted")
 def start_wordle_thread(team_id: str):
-    timezone = get_timezone_for_team(team_id=team_id)
+    timezone = get_timezone_for_team(app=app, team_id=team_id)
     message = generate_wordle_thread_message(timezone=timezone)
     for channel_id in get_member_channel_ids(team_id=team_id):
         force_client_auth(app, team_id)

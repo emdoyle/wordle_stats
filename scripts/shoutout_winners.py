@@ -26,7 +26,7 @@ def generate_winners_message(team_id: str) -> str:
     # :first_place_medal: (user_mentions)
     # :second_place_medal: (user_mentions)
     # :third_place_medal: (user_mentions)
-    team_timezone = get_timezone_for_team(team_id=team_id) or PACIFIC_TIME
+    team_timezone = get_timezone_for_team(app=app, team_id=team_id) or PACIFIC_TIME
     today = datetime.now(team_timezone)
     midnight = today.replace(hour=0, minute=0, second=0, microsecond=0)
     yesterday_midnight = midnight - timedelta(days=1)
