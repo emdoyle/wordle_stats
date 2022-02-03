@@ -8,7 +8,7 @@ from util.auth import force_client_auth
 from util.channels import get_member_channel_ids
 from util.tasks import daily_task
 from util.teams import installed_team_ids
-from util.timezone import PACIFIC_TIME
+from util.timezone import PACIFIC_TIME, get_timezone_for_team
 
 
 def generate_wordle_thread_message(timezone: Optional["ZoneInfo"] = None) -> str:
@@ -20,13 +20,7 @@ def generate_wordle_thread_message(timezone: Optional["ZoneInfo"] = None) -> str
 
 @daily_task(app, "solution_thread_posted")
 def start_wordle_thread(team_id: str):
-    installation = app.installation_store.find_installation(
-        enterprise_id=None, team_id=team_id
-    )
-    if installation is None:
-        return
-    raw_timezone = installation.get_custom_value(name=TIMEZONE_CUSTOM_KEY)
-    timezone = ZoneInfo(raw_timezone) if raw_timezone is not None else PACIFIC_TIME
+    timezone = get_timezone_for_team(team_id=team_id)
     message = generate_wordle_thread_message(timezone=timezone)
     for channel_id in get_member_channel_ids(team_id=team_id):
         force_client_auth(app, team_id)

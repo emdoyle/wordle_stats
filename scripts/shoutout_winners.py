@@ -10,7 +10,7 @@ from app.db import Score, User, get_engine
 from util.channels import get_member_channel_ids
 from util.tasks import daily_task
 from util.teams import installed_team_ids
-from util.timezone import PACIFIC_TIME
+from util.timezone import PACIFIC_TIME, get_timezone_for_team
 
 EMOJI_PLACEMENTS = [
     ":first_place_medal:",
@@ -26,7 +26,8 @@ def generate_winners_message(team_id: str) -> str:
     # :first_place_medal: (user_mentions)
     # :second_place_medal: (user_mentions)
     # :third_place_medal: (user_mentions)
-    today = datetime.now(PACIFIC_TIME)
+    team_timezone = get_timezone_for_team(team_id=team_id) or PACIFIC_TIME
+    today = datetime.now(team_timezone)
     midnight = today.replace(hour=0, minute=0, second=0, microsecond=0)
     yesterday_midnight = midnight - timedelta(days=1)
     midnight_utc = midnight.astimezone(timezone.utc)

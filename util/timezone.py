@@ -1,7 +1,10 @@
 from datetime import datetime
 from itertools import islice
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 from zoneinfo import ZoneInfo
+
+from app.apps import app
+from app.constants import TIMEZONE_CUSTOM_KEY
 
 PACIFIC_TIMEZONE_NAME = "America/Los_Angeles"
 PACIFIC_TIME = ZoneInfo("America/Los_Angeles")
@@ -514,3 +517,13 @@ def search_timezones(query: str = "", max_results: int = 8) -> List[Tuple[str, s
         if query in timezone_display.lower():
             results.append((timezone_display, timezone_value))
     return results
+
+
+def get_timezone_for_team(team_id: str) -> Optional["ZoneInfo"]:
+    installation = app.installation_store.find_installation(
+        enterprise_id=None, team_id=team_id
+    )
+    if installation is None:
+        return None
+    raw_timezone = installation.get_custom_value(name=TIMEZONE_CUSTOM_KEY)
+    return ZoneInfo(raw_timezone) if raw_timezone is not None else PACIFIC_TIME
