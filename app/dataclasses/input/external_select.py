@@ -15,6 +15,7 @@ class ExternalSelect:
     action_id: str
     placeholder: PlainTextBlock
     initial_option: Optional[SelectOption] = None
+    min_query_length: int = 3
     type: str = "external_select"
 
 

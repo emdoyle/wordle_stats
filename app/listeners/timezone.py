@@ -32,6 +32,7 @@ def handle_select_timezone(ack, client, body, action):
         enterprise_id=None, team_id=team_id
     )
     installation.set_custom_value(name="timezone", value=timezone)
+    app.installation_store.save(installation)
     client.views_publish(
         user_id=user_id,
         view={"type": "home", "blocks": get_home_tab_blocks(timezone=timezone)},

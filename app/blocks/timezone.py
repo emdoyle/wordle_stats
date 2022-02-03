@@ -35,6 +35,7 @@ def get_timezone_select_section(timezone: Optional[str] = None):
                     text=PlainTextBlock(text=timezone),
                     value=timezone,
                 ),
+                min_query_length=1,
             ),
         )
     )
