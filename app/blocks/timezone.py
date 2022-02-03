@@ -10,15 +10,14 @@ from app.dataclasses import (
     PlainTextBlock,
     SelectOption,
 )
-from util.timezone import PACIFIC_TIMEZONE_NAME, get_timezones_by_prefix
+from util.timezone import PACIFIC_TIMEZONE_NAME, search_timezones
 
 
-@functools.lru_cache(maxsize=100)
-def get_timezone_options(prefix: str = ""):
-    timezones = get_timezones_by_prefix(prefix=prefix)
+def get_timezone_options(query: str = ""):
+    timezones = search_timezones(query=query)
     return [
-        {"text": asdict(PlainTextBlock(text=timezone)), "value": timezone}
-        for timezone in timezones
+        {"text": asdict(PlainTextBlock(text=timezone_display)), "value": timezone_value}
+        for timezone_display, timezone_value in timezones
     ]
 
 

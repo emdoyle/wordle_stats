@@ -4,4 +4,3 @@ SQLAlchemy==1.4.29
 alembic==1.7.5
 fastapi==0.73.0
 uvicorn==0.17.0.post1
-marisa-trie==0.7.7
