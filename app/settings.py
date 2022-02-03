@@ -21,6 +21,7 @@ SLACK_INSTALL_PATH = env.str("SLACK_INSTALL_PATH", "/slack/install")
 SLACK_OAUTH_REDIRECT_PATH = env.str(
     "SLACK_OAUTH_REDIRECT_PATH", "/slack/oauth_redirect"
 )
+TIMEZONE_OPTIONS_PATH = env.str("TIMEZONE_OPTIONS_PATH", "/slack/timezone_options")
 
 DB_FOLDER = env.str("DB_FOLDER", "databases/")
 DB_FILE_EXTENSION = env.str("DB_FILE_EXTENSION", ".db")

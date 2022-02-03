@@ -1,9 +1,10 @@
 from fastapi import FastAPI, Request
 from slack_bolt.adapter.fastapi import SlackRequestHandler
-from slack_bolt.adapter.socket_mode import SocketModeHandler
+from starlette.responses import JSONResponse
 
 from app import settings
 from app.apps import app
+from app.blocks.timezone import get_timezone_options
 from app.listeners import *
 
 api_handler = SlackRequestHandler(app)
@@ -23,3 +24,9 @@ async def install(request: Request):
 @api_server.get(settings.SLACK_OAUTH_REDIRECT_PATH)
 async def oauth_redirect(request: Request):
     return await api_handler.handle(request)
+
+
+@api_server.get(settings.TIMEZONE_OPTIONS_PATH)
+def get_timezone_options(request: Request):
+    print(request.json())
+    return JSONResponse(content=get_timezone_options())

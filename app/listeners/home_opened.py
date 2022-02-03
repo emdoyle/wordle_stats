@@ -12,8 +12,17 @@ def handle_app_home_opened(client, body):
     user_id = event["user"]
     channel_id = event["channel"]
 
+    if "view" in event:
+        team_id = event["view"]["team_id"]
+        installation = app.installation_store.find_installation(
+            enterprise_id=None, team_id=team_id
+        )
+        timezone = installation.get_custom_value(name="timezone")
+        blocks = get_home_tab_blocks(timezone=timezone)
+    else:
+        blocks = get_home_tab_blocks()
     response = client.views_publish(
-        user_id=user_id, view={"type": "home", "blocks": get_home_tab_blocks()}
+        user_id=user_id, view={"type": "home", "blocks": blocks}
     )
 
     view = response.data["view"]

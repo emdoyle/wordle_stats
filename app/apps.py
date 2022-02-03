@@ -4,6 +4,8 @@ from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_sdk.oauth.installation_store import FileInstallationStore
 from slack_sdk.oauth.state_store import FileOAuthStateStore
 
+from util.timezone import PACIFIC_TIMEZONE_NAME
+
 from . import settings
 from .db import Base, get_engine
 
@@ -25,6 +27,8 @@ SCOPES = [
 
 def oauth_success(args: SuccessArgs) -> BoltResponse:
     installation = args.installation
+    installation.set_custom_value(name="timezone", value=PACIFIC_TIMEZONE_NAME)
+    args.settings.installation_store.save(installation)
     # TODO: async
     Base.metadata.create_all(get_engine(team_id=installation.team_id))
     return BoltResponse(status=200, body="Wordle has been installed successfully!")
