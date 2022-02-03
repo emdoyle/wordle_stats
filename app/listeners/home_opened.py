@@ -9,6 +9,9 @@ from app.db import User, get_engine
 @app.event("app_home_opened")
 def handle_app_home_opened(client, body):
     event = body["event"]
+    if not event["tab"] == "home":
+        return
+
     user_id = event["user"]
     channel_id = event["channel"]
 
