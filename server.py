@@ -27,6 +27,9 @@ async def oauth_redirect(request: Request):
 
 
 @api_server.post(settings.TIMEZONE_OPTIONS_PATH)
-def handle_timezone_options(request: Request):
-    print(request.json())
-    return JSONResponse(content=get_timezone_options())
+async def handle_timezone_options(request: Request):
+    response = await request.json()
+    print(response)
+    options = get_timezone_options()
+    print(options)
+    return JSONResponse(content=options)
