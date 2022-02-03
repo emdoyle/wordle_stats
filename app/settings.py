@@ -8,6 +8,8 @@ DEBUG = env.bool("DEBUG", False)
 
 DEV_SERVER_PORT = env.int("DEV_SERVER_PORT", 8000)
 TESTING_CHANNEL_ID = env.str("TESTING_CHANNEL_ID", "")
+MARKETING_SITE_URL = env.str("MARKETING_SITE_URL", "https://wordle.0x63problems.dev")
+OAUTH_SUCCESS_PATH = env.str("OAUTH_SUCCESS_URL", "/success")
 
 SLACK_SIGNING_SECRET = env.str("SLACK_SIGNING_SECRET", "")
 SLACK_APP_TOKEN = env.str("SLACK_APP_TOKEN")
