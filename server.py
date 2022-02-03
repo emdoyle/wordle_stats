@@ -31,5 +31,4 @@ async def oauth_redirect(request: Request):
 async def handle_timezone_options(request: Request):
     body = await request.body()
     request = to_bolt_request(request, body)
-    print(request.body)
-    return JSONResponse(content=get_timezone_options())
+    return JSONResponse(content=get_timezone_options(prefix=request.body.get("value")))
