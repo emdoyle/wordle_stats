@@ -30,9 +30,7 @@ async def oauth_redirect(request: Request):
 async def handle_timezone_options(request: Request):
     try:
         response = await request.body()
-        print(response)
-        form = await request.form()
-        print(form)
+        print(response.decode("utf-8"))
     except:
         pass
     options = get_timezone_options()
