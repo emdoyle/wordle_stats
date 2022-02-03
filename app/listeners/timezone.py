@@ -11,12 +11,11 @@ from app.db import User, get_engine
 @app.action(SELECT_TIMEZONE_ACTION_ID)
 def handle_select_timezone(ack, client, body, action):
     ack()
-    print(body)
-    print(action)
+
     team_id = body["team"]["id"]
     user_id = body["user"]["id"]
     username = body["user"]["username"]
-    timezone = action["value"]
+    timezone = action["selected_option"]["value"]
 
     with Session(get_engine(team_id=team_id)) as session:
         user = (
