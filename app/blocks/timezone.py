@@ -16,12 +16,10 @@ from util.timezone import PACIFIC_TIMEZONE_NAME, get_timezones_by_prefix
 @functools.lru_cache(maxsize=100)
 def get_timezone_options(prefix: str = ""):
     timezones = get_timezones_by_prefix(prefix=prefix)
-    return {
-        "options": [
-            {"text": asdict(PlainTextBlock(text=timezone)), "value": timezone}
-            for timezone in timezones
-        ]
-    }
+    return [
+        {"text": asdict(PlainTextBlock(text=timezone)), "value": timezone}
+        for timezone in timezones
+    ]
 
 
 @functools.lru_cache(maxsize=100)
