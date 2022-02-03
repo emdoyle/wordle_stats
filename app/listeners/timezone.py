@@ -40,4 +40,6 @@ def handle_select_timezone(ack, client, body, action):
 
 @app.options(SELECT_TIMEZONE_ACTION_ID)
 def search_timezone_options(ack, options):
-    ack(options=get_timezone_options(prefix=options.get("value")))
+    tz_options = get_timezone_options(prefix=options.get("value"))
+    print(tz_options)
+    ack(options=tz_options)
