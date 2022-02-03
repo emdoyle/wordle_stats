@@ -25,7 +25,9 @@ def get_timezone_options(prefix: str = ""):
 
 
 @functools.lru_cache(maxsize=100)
-def get_timezone_select_section(timezone: Optional[str] = PACIFIC_TIMEZONE_NAME):
+def get_timezone_select_section(timezone: Optional[str] = None):
+    if timezone is None:
+        timezone = PACIFIC_TIMEZONE_NAME
     return asdict(
         ExternalSelectSection(
             text=MrkdwnBlock(text="Timezone"),
