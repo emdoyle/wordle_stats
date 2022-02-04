@@ -1,3 +1,6 @@
+import logging
+from logging.handlers import RotatingFileHandler
+
 from slack_bolt import App, BoltResponse
 from slack_bolt.oauth.callback_options import CallbackOptions, FailureArgs, SuccessArgs
 from slack_bolt.oauth.oauth_settings import OAuthSettings
@@ -9,6 +12,15 @@ from util.timezone import PACIFIC_TIMEZONE_NAME
 from . import settings
 from .constants import TIMEZONE_CUSTOM_KEY
 from .db import Base, get_engine
+
+logging.basicConfig(
+    level=settings.LOG_LEVEL,
+    handlers=[
+        RotatingFileHandler(
+            filename=settings.LOG_FILE_NAME, maxBytes=settings.MAX_LOG_FILE_BYTES
+        ),
+    ],
+)
 
 SCOPES = [
     "app_mentions:read",
