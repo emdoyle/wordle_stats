@@ -83,7 +83,7 @@ def generate_winners_message(team_id: str) -> str:
     return f"{header}\n\n{results}"
 
 
-@daily_task(app, "shoutout_winners_posted")
+@daily_task(app, "shoutout_winners_posted", skip_on_install_day=True)
 def shoutout_winners(team_id: str):
     message = generate_winners_message(team_id=team_id)
     for channel_id in get_member_channel_ids(team_id=team_id):

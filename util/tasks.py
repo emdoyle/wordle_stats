@@ -10,7 +10,7 @@ from app.dataclasses.daily_tasks import DailyTasks
 from util.timezone import PACIFIC_TIME
 
 
-def daily_task(app: "App", attribute_name: str):
+def daily_task(app: "App", attribute_name: str, skip_on_install_day: bool = False):
     def decorator(task: Callable):
         @wraps(task)
         def wrapped_task(*, team_id: str, **kwargs):
@@ -27,7 +27,7 @@ def daily_task(app: "App", attribute_name: str):
                 installation.installed_at, timezone
             ).date()
             today = datetime.now(timezone).date()
-            if installed_date == today:
+            if skip_on_install_day and installed_date == today:
                 # Do not post on the same day the app was installed
                 return
             raw_daily_tasks = installation.get_custom_value(name=DAILY_TASKS_CUSTOM_KEY)
