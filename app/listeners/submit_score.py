@@ -39,6 +39,8 @@ def handle_wordle_score(ack, action, respond, body):
             user = session.execute(
                 select(User).where(User.slack_id == user_id)
             ).first()[0]
+            user.username = username
+            session.add(user)
         except (TypeError, IndexError):
             user = User(slack_id=user_id, username=username)
             session.add(user)
