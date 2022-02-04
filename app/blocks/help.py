@@ -11,21 +11,9 @@ from ..dataclasses import (
 
 
 @functools.lru_cache()
-def get_help_blocks():
+def get_tutorial_blocks():
     divider = asdict(FROZEN_DIVIDER)
     return [
-        asdict(
-            PlainTextSection(
-                text=PlainTextBlock(
-                    text=(
-                        "Wordle Stats helps you track your Wordle scores "
-                        "and compete with your friends and co-workers!\n"
-                    ),
-                    emoji=True,
-                )
-            )
-        ),
-        divider,
         asdict(
             MrkdwnSection(
                 text=MrkdwnBlock(text="Want to submit a score?\n\n\tType `/submit`\n")
@@ -43,6 +31,26 @@ def get_help_blocks():
                 )
             )
         ),
+    ]
+
+
+@functools.lru_cache()
+def get_help_blocks():
+    divider = asdict(FROZEN_DIVIDER)
+    return [
+        asdict(
+            PlainTextSection(
+                text=PlainTextBlock(
+                    text=(
+                        "Wordle Stats helps you track your Wordle scores "
+                        "and compete with your friends and co-workers!\n"
+                    ),
+                    emoji=True,
+                )
+            )
+        ),
+        divider,
+        *get_tutorial_blocks(),
     ]
 
 

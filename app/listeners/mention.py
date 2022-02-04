@@ -1,13 +1,11 @@
 from app.apps import app
-from app.blocks import get_help_blocks
-from app.regex import HELP_REGEX
+from app.blocks import get_tutorial_blocks
 
 
 @app.event("app_mention")
 def handle_mention(client, body):
     event = body["event"]
-    if HELP_REGEX.match(event["text"]):
-        client.chat_postEphemeral(
-            channel=event["channel"], user=event["user"], blocks=get_help_blocks()
-        )
-        return
+    # For now, since no mention actions, just show tutorial every time
+    client.chat_postEphemeral(
+        channel=event["channel"], user=event["user"], blocks=get_tutorial_blocks()
+    )
