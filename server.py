@@ -1,5 +1,4 @@
 import logging
-import sys
 from logging.handlers import RotatingFileHandler
 
 from fastapi import FastAPI, Request
@@ -16,7 +15,6 @@ api_server = FastAPI()
 logging.basicConfig(
     level=settings.LOG_LEVEL,
     handlers=[
-        logging.StreamHandler(sys.stdout),
         RotatingFileHandler(
             filename=settings.LOG_FILE_NAME, maxBytes=settings.MAX_LOG_FILE_BYTES
         ),
