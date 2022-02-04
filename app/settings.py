@@ -1,3 +1,5 @@
+import logging
+
 from environs import Env
 
 env = Env()
@@ -5,6 +7,7 @@ env = Env()
 env.read_env()
 
 DEBUG = env.bool("DEBUG", False)
+LOG_LEVEL = env.int("LOG_LEVEL", logging.INFO)
 LOG_FILE_NAME = env.str("LOG_FILE_NAME", "logs/server_logs")
 MAX_LOG_FILE_BYTES = env.int(
     "MAX_LOG_FILE_BYTES", 1024 * 1024 * 10

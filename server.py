@@ -14,7 +14,7 @@ api_server = FastAPI()
 
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=settings.LOG_LEVEL,
     handlers=[
         logging.StreamHandler(sys.stdout),
         RotatingFileHandler(
