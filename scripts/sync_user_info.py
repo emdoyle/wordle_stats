@@ -12,6 +12,7 @@ from util.teams import installed_team_ids
 
 @dataclass
 class UserInfo:
+    username: str = ""
     display_name: str = ""
     real_name: str = ""
     slack_id: str = ""
@@ -19,6 +20,7 @@ class UserInfo:
     @classmethod
     def from_user_data(cls, user_data: Dict) -> "UserInfo":
         return cls(
+            username=user_data["name"],
             display_name=user_data["profile"]["display_name"],
             real_name=user_data["profile"]["real_name"],
             slack_id=user_data["id"],
@@ -47,6 +49,7 @@ def run() -> None:
                 if latest_data_for_user is not None:
                     print(f"Updating user: {current_user}")
                     print(f"\twith data: {latest_data_for_user}")
+                    current_user.username = latest_data_for_user.username
                     current_user.display_name = latest_data_for_user.display_name
                     current_user.real_name = latest_data_for_user.real_name
                     current_user.slack_id = latest_data_for_user.slack_id
