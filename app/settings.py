@@ -5,6 +5,10 @@ env = Env()
 env.read_env()
 
 DEBUG = env.bool("DEBUG", False)
+LOG_FILE_NAME = env.str("LOG_FILE_NAME", "logs/server_logs")
+MAX_LOG_FILE_BYTES = env.int(
+    "MAX_LOG_FILE_BYTES", 1024 * 1024 * 10
+)  # 10MB log file default
 
 DEV_SERVER_PORT = env.int("DEV_SERVER_PORT", 8000)
 TESTING_CHANNEL_ID = env.str("TESTING_CHANNEL_ID", "")

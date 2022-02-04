@@ -52,7 +52,8 @@ def display_user_scores(team_id: str, user_mention: "UserMention") -> str:
 
 
 @app.command("/scores")
-def handle_scores_command(ack, respond, command):
+def handle_scores_command(ack, respond, command, logger):
+    logger.debug("handle_scores_command called")
     ack()
     team_id = command["team_id"]
     items = command["text"].strip().split()
@@ -65,8 +66,10 @@ def handle_scores_command(ack, respond, command):
             )
         )
     except ValueError as e:
+        logger.exception("Error displaying scores")
         respond(blocks=[get_error_block(error=e)])
         return
     if not response_text:
         respond(text="Usage: /scores @user1 [@user2 ...]")
+    logger.info("Display scores: %s", response_text)
     respond(text=response_text)

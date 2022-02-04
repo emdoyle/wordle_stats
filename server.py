@@ -1,3 +1,7 @@
+import logging
+import sys
+from logging.handlers import RotatingFileHandler
+
 from fastapi import FastAPI, Request
 from slack_bolt.adapter.fastapi import SlackRequestHandler
 
@@ -7,6 +11,17 @@ from app.listeners import *
 
 api_handler = SlackRequestHandler(app)
 api_server = FastAPI()
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        RotatingFileHandler(
+            filename=settings.LOG_FILE_NAME, maxBytes=settings.MAX_LOG_FILE_BYTES
+        ),
+    ],
+)
 
 
 @api_server.post(settings.SLACK_EVENTS_PATH)

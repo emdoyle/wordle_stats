@@ -7,7 +7,8 @@ from app.db import User, get_engine
 
 
 @app.event("member_joined_channel")
-def handle_member_joined(client, body):
+def handle_member_joined(client, body, logger):
+    logger.debug("handle_member_joined called")
     event = body["event"]
     team_id = body["team_id"]
     user_id = event["user"]
@@ -20,8 +21,10 @@ def handle_member_joined(client, body):
             .first()
         )
         if user is None:
+            logger.info("Creating new user with slack ID %s", user_id)
             user = User(slack_id=user_id)
         if not user.onboarded:
+            logger.info("Showing onboarding for user %s", user_id)
             user.onboarded = True
             session.add(user)
             client.chat_postEphemeral(
