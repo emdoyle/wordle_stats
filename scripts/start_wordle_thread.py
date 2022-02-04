@@ -17,7 +17,7 @@ def generate_wordle_thread_message(timezone: Optional["ZoneInfo"] = None) -> str
     return f"{today.strftime('%m/%d').lstrip('0')} Solution Thread"
 
 
-@daily_task(app, "solution_thread_posted")
+@daily_task(app, "solution_thread_posted", hour=5)
 def start_wordle_thread(team_id: str):
     timezone = get_timezone_for_team(app=app, team_id=team_id)
     message = generate_wordle_thread_message(timezone=timezone)

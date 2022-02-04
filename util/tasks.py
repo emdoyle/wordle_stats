@@ -10,7 +10,15 @@ from app.dataclasses.daily_tasks import DailyTasks
 from util.timezone import PACIFIC_TIME
 
 
-def daily_task(app: "App", attribute_name: str, skip_on_install_day: bool = False):
+def daily_task(
+    app: "App",
+    attribute_name: str,
+    skip_on_install_day: bool = False,
+    hour: int = 0,
+    minute: int = 0,
+    second: int = 0,
+    microsecond: int = 0,
+):
     def decorator(task: Callable):
         @wraps(task)
         def wrapped_task(*, team_id: str, **kwargs):
@@ -26,7 +34,15 @@ def daily_task(app: "App", attribute_name: str, skip_on_install_day: bool = Fals
             installed_date = datetime.fromtimestamp(
                 installation.installed_at, timezone
             ).date()
-            today = datetime.now(timezone).date()
+            now = datetime.now(timezone)
+            threshold_time = now.replace(
+                hour=hour, minute=minute, second=second, microsecond=microsecond
+            )
+            if now < threshold_time:
+                # It is not time to process this task yet today
+                # (default is threshold_time == beginning of the day)
+                return
+            today = now.date()
             if skip_on_install_day and installed_date == today:
                 # Do not post on the same day the app was installed
                 return
@@ -36,10 +52,8 @@ def daily_task(app: "App", attribute_name: str, skip_on_install_day: bool = Fals
                 if raw_daily_tasks is not None
                 else DailyTasks()
             )
-            if (
-                getattr(daily_tasks, attribute_name) is not None
-                and getattr(daily_tasks, attribute_name) >= today
-            ):
+            recorded_date = getattr(daily_tasks, attribute_name)
+            if recorded_date is not None and recorded_date >= today:
                 # We have already processed this task for this team today.
                 return
             task(team_id=team_id, **kwargs)

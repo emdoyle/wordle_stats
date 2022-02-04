@@ -1,1 +1,0 @@
-This folder should hold server logs.

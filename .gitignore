@@ -4,5 +4,3 @@
 **/__pycache__
 *.db
 data/
-logs/*
-!logs/README.md
