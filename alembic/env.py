@@ -27,9 +27,12 @@ target_metadata = Base.metadata
 # ... etc.
 
 
-config.set_main_option(
-    "sqlalchemy.url", f"sqlite+pysqlite:///{os.environ['ALEMBIC_DB_PATH']}"
-)
+def _get_db_driver_url() -> str:
+    db_driver_url = context.get_x_argument(as_dictionary=True).get("db_driver_url")
+
+    if db_driver_url:
+        return db_driver_url
+    return config.get_main_option("sqlalchemy.url")
 
 
 def run_migrations_offline():
@@ -44,7 +47,7 @@ def run_migrations_offline():
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    url = _get_db_driver_url()
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -64,8 +67,13 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
+    # get the alembic section of the config file
+    ini_section = config.get_section(config.config_ini_section)
+    db_driver_url = _get_db_driver_url()
+    ini_section["sqlalchemy.url"] = db_driver_url
+
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
+        ini_section,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
