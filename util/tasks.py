@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from functools import wraps
 from typing import Callable
@@ -8,6 +9,8 @@ from slack_bolt import App
 from app.constants import DAILY_TASKS_CUSTOM_KEY, TIMEZONE_CUSTOM_KEY
 from app.dataclasses.daily_tasks import DailyTasks
 from util.timezone import PACIFIC_TIME
+
+logger = logging.getLogger()
 
 
 def daily_task(
@@ -26,6 +29,10 @@ def daily_task(
                 enterprise_id=None, team_id=team_id
             )
             if installation is None:
+                logger.warning(
+                    "Could not find installation for team %s, but called daily_task?",
+                    team_id,
+                )
                 return
             raw_timezone = installation.get_custom_value(name=TIMEZONE_CUSTOM_KEY)
             timezone = (
@@ -41,10 +48,20 @@ def daily_task(
             if now < threshold_time:
                 # It is not time to process this task yet today
                 # (default is threshold_time == beginning of the day)
+                logger.info(
+                    "It is not time to process this task yet today.\nnow=%s, threshold=%s",
+                    now,
+                    threshold_time,
+                )
                 return
             today = now.date()
             if skip_on_install_day and installed_date == today:
                 # Do not post on the same day the app was installed
+                logger.info(
+                    "This task is skipped on install day, and today (%s) is install day for team %s",
+                    today,
+                    team_id,
+                )
                 return
             raw_daily_tasks = installation.get_custom_value(name=DAILY_TASKS_CUSTOM_KEY)
             daily_tasks = (
@@ -55,6 +72,11 @@ def daily_task(
             recorded_date = getattr(daily_tasks, attribute_name)
             if recorded_date is not None and recorded_date >= today:
                 # We have already processed this task for this team today.
+                logger.info(
+                    "This task has already been processed for team %s today (%s)",
+                    team_id,
+                    today,
+                )
                 return
             task(team_id=team_id, **kwargs)
             setattr(daily_tasks, attribute_name, today)
