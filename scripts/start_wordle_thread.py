@@ -1,6 +1,9 @@
+import logging
 from datetime import datetime
 from typing import Optional
 from zoneinfo import ZoneInfo
+
+from slack_sdk.errors import SlackApiError
 
 from app.apps import app
 from util.auth import force_client_auth
@@ -8,6 +11,8 @@ from util.channels import get_member_channel_ids
 from util.tasks import daily_task
 from util.teams import installed_team_ids
 from util.timezone import PACIFIC_TIME, get_timezone_for_team
+
+logger = logging.getLogger()
 
 
 def generate_wordle_thread_message(timezone: Optional["ZoneInfo"] = None) -> str:
@@ -21,9 +26,12 @@ def generate_wordle_thread_message(timezone: Optional["ZoneInfo"] = None) -> str
 def start_wordle_thread(team_id: str):
     timezone = get_timezone_for_team(app=app, team_id=team_id)
     message = generate_wordle_thread_message(timezone=timezone)
-    for channel_id in get_member_channel_ids(team_id=team_id):
-        force_client_auth(app, team_id)
-        app.client.chat_postMessage(channel=channel_id, text=message)
+    try:
+        for channel_id in get_member_channel_ids(team_id=team_id):
+            force_client_auth(app, team_id)
+            app.client.chat_postMessage(channel=channel_id, text=message)
+    except SlackApiError:
+        logger.exception("Failed to start_wordle_thread for team %s", team_id)
 
 
 def run() -> None:

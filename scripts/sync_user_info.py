@@ -1,6 +1,8 @@
+import logging
 from dataclasses import dataclass
 from typing import Dict
 
+from slack_sdk.errors import SlackApiError
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -8,6 +10,8 @@ from app.apps import app
 from app.db import User, get_engine
 from util.auth import force_client_auth
 from util.teams import installed_team_ids
+
+logger = logging.getLogger()
 
 
 @dataclass
@@ -29,8 +33,12 @@ class UserInfo:
 
 def run() -> None:
     for team_id in installed_team_ids():
-        force_client_auth(app, team_id)
-        response = app.client.users_list(team_id=team_id)
+        try:
+            force_client_auth(app, team_id)
+            response = app.client.users_list(team_id=team_id)
+        except SlackApiError:
+            logger.exception("Failed to sync_user_info for team %s", team_id)
+            continue
         latest_user_data = response["members"]
         latest_user_data_by_username = {
             user_data["name"]: UserInfo.from_user_data(user_data)

@@ -1,5 +1,7 @@
+import logging
 from datetime import datetime, timedelta, timezone
 
+from slack_sdk.errors import SlackApiError
 from sqlalchemy import desc, select
 from sqlalchemy.orm import Session
 
@@ -11,6 +13,9 @@ from util.channels import get_member_channel_ids
 from util.tasks import daily_task
 from util.teams import installed_team_ids
 from util.timezone import PACIFIC_TIME, get_timezone_for_team
+
+logger = logging.getLogger()
+
 
 EMOJI_PLACEMENTS = [
     ":first_place_medal:",
@@ -86,8 +91,11 @@ def generate_winners_message(team_id: str) -> str:
 @daily_task(app, "shoutout_winners_posted", skip_on_install_day=True)
 def shoutout_winners(team_id: str):
     message = generate_winners_message(team_id=team_id)
-    for channel_id in get_member_channel_ids(team_id=team_id):
-        app.client.chat_postMessage(channel=channel_id, text=message)
+    try:
+        for channel_id in get_member_channel_ids(team_id=team_id):
+            app.client.chat_postMessage(channel=channel_id, text=message)
+    except SlackApiError:
+        logger.exception("Failed to shoutout_winners for team %s", team_id)
 
 
 def run() -> None:
