@@ -24,13 +24,11 @@ logging.basicConfig(
 
 SCOPES = [
     "app_mentions:read",
-    "channels:history",
     "channels:read",
     "chat:write",
     "groups:read",
     "im:history",
     "im:read",
-    "incoming-webhook",
     "mpim:read",
     "users:read",
     "users.profile:read",
